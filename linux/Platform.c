@@ -25,12 +25,14 @@ in the source distribution for its full text.
 
 #include "BatteryMeter.h"
 #include "CPUMeter.h"
+#include "CRT.h"
 #include "DateTimeMeter.h"
 #include "DiskIOMeter.h"
 #include "FileDescriptorMeter.h"
 #include "GPUMeter.h"
 #include "HostnameMeter.h"
 #include "HugePageMeter.h"
+#include "InfoScreen.h"
 #include "LoadAverageMeter.h"
 #include "Machine.h"
 #include "Macros.h"
@@ -53,6 +55,7 @@ in the source distribution for its full text.
 #include "linux/IOPriorityPanel.h"
 #include "linux/LinuxMachine.h"
 #include "linux/LinuxProcess.h"
+#include "linux/NetConnectionsScreen.h"
 #include "linux/OpenRCMeter.h"
 #include "linux/SELinuxMeter.h"
 #include "linux/SystemdMeter.h"
@@ -221,8 +224,25 @@ static Htop_Reaction Platform_actionLowerAutogroupPriority(State* st) {
    return changed ? HTOP_REFRESH : HTOP_OK;
 }
 
+static Htop_Reaction Platform_actionShowNetConnections(State* st) {
+   if (st->host->settings->ss->dynamic)
+      return HTOP_OK;
+
+   const Process* p = (const Process*) Panel_getSelected((Panel*)st->mainPanel);
+   if (!p)
+      return HTOP_OK;
+
+   NetConnectionsScreen* ncs = NetConnectionsScreen_new(p);
+   InfoScreen_run((InfoScreen*)ncs);
+   NetConnectionsScreen_delete((Object*)ncs);
+   clear();
+   CRT_enableDelay();
+   return HTOP_REFRESH | HTOP_REDRAW_BAR;
+}
+
 void Platform_setBindings(Htop_Action* keys) {
    keys['i'] = Platform_actionSetIOPriority;
+   keys['n'] = Platform_actionShowNetConnections;
    keys['{'] = Platform_actionLowerAutogroupPriority;
    keys['}'] = Platform_actionHigherAutogroupPriority;
    keys[KEY_F(19)] = Platform_actionLowerAutogroupPriority;  // Shift-F7
