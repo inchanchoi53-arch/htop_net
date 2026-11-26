@@ -56,6 +56,7 @@ in the source distribution for its full text.
 #include "linux/OpenRCMeter.h"
 #include "linux/SELinuxMeter.h"
 #include "linux/SystemdMeter.h"
+#include "linux/TcpStateMeter.h"
 #include "linux/ZramMeter.h"
 #include "linux/ZramStats.h"
 #include "linux/ZswapMeter.h"
@@ -273,6 +274,7 @@ const MeterClass* const Platform_meterTypes[] = {
    &DiskIOTimeMeter_class,
    &DiskIOMeter_class,
    &NetworkIOMeter_class,
+   &TcpStateMeter_class,
    &SELinuxMeter_class,
    &SystemdMeter_class,
    &SystemdUserMeter_class,
